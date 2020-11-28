@@ -1,12 +1,12 @@
 version: "3.5"
 networks:
-  example_service-pgadmin:
+  ddclient-pgadmin:
 
 services:
   pgadmin:
     networks:
-      - example_service-pgadmin
+      - ddclient-pgadmin
 
-  example_service:
+  ddclient:
     networks:
-      - example_service-pgadmin
+      - ddclient-pgadmin
