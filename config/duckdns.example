@@ -1,0 +1,7 @@
+##
+## Duckdns (http://www.duckdns.org/)
+##
+#
+password=<DNS_TOKEN>
+use=cmd, cmd='echo <HOST_IP>'
+protocol=duckdns <NFQDN-HOSTNAME>

@@ -1,24 +1,20 @@
 version: "3.5"
-# Use replace_ddclient.sh to replace all instances of ddclient
-# with your_actual_service_name and  with YOUR_ACTUAL_SERVICE_NAME. 
 
 networks:
   ddclient:
-  ddclient-private:
 
 volumes:
   ddclient:
-  ddclient-db:
 
 secrets:
   ddclient_admin_password:
     name: ${STACK_NAME:-technocore}_ddclient_admin_password
     external: true
-  ddclient_ddclient_db_password:
-    name: ${STACK_NAME:-technocore}_ddclient_ddclient_db_password
+  ddclient_dns_user:
+    name: ${STACK_NAME:-technocore}_ddclient_dns_user
     external: true
-  ddclient_db_ddclient_password:
-    name: ${STACK_NAME:-technocore}_ddclient_db_ddclient_password
+  ddclient_dns_token:
+    name: ${STACK_NAME:-technocore}_ddclient_dns_token
     external: true
 
 services:
@@ -44,6 +40,8 @@ services:
       #  # Traefik service that listens to HTTPS
       #  - traefik.webservice.frontend.entryPoints=https
         - com.ouroboros.enable=true
+        - user-provided-secret-dns_token=ddclient dns_token
+        - user-provided-secret-dns_user=ddclient dns_user
       mode: global
       restart_policy:
         condition: any
@@ -57,10 +55,9 @@ services:
         reservations:
           memory: 64M
     environment:
-      # Sometimes you have to pass in ${DOMAIN} to enable the correct link paths to be generated.
-      #- MQTT_USER=${ddclient}
-      - ADMIN_USER=${ADMIN_USER}
-      - ADMIN_PASSWORD={{"{{DOCKER-SECRET:admin_password}}"}}
+      - SERVER_HOSTNAME=$SERVER_HOSTNAME
+      - DOMAIN=$DOMAIN
+      - DNS_PROVIDER=${DNS_PROVIDER}
     image: ${image_provider:-scififarms}/technocore-ddclient:${TAG:-latest}
     logging:
       driver: "${LOGGING_DRIVER}"
@@ -68,41 +65,14 @@ services:
         tag: "{{.Name}}"
     networks:
       - ddclient
-      - ddclient-private
-    #secrets:
+    secrets:
     #  - source: ddclient_admin_password
     #    target: admin_password
-    #  - source: ddclient_ddclient_db_password
-    #    target: ddclient_db_password
+      - source: ddclient_dns_token
+        target: dns_token
+      - source: ddclient_dns_user
+        target: dns_user
     volumes:
-      # Likely need to change this
-      - ddclient:/var/lib/ddclient
-      # This should in fact be all upper case.
-      - ${DEV_MOUNT__MIGRATIONS:-$EMPTY_MOUNT}
-
-  ddclient_db:
-    deploy:
-      labels:
-        - com.ouroboros.enable=true
-      mode: global
-      restart_policy:
-        condition: any
-    environment:
-      - POSTGRES_USER=ddclient
-      - POSTGRES_PASSWORD={{"{{DOCKER-SECRET:ddclient_password}}"}}
-      - POSTGRES_DB=ddclient
-    image: ${image_provider:-scififarms}/technocore-ddclient-db:${TAG:-latest}
-    logging:
-      driver: "${LOGGING_DRIVER}"
-      options:
-        tag: "{{.Name}}"
-    networks:
-      - ddclient-private
-    secrets:
-      - source: ddclient_db_admin_password
-        target: admin_password
-      - source: ddclient_db_ddclient_password
-        target: ddclient_password
-    volumes:
-      # Likely need to change this
-      - ddclient-db:/var/lib/postgresql/data
+      # Use tmpfs so that credentials never make it to disk. 
+      - type: tmpfs
+        target: /etc/ddclient

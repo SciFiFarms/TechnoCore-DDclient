@@ -44,8 +44,15 @@ env_secrets_expand() {
     fi
 }
 env_secrets_expand
-dogfish migrate &
+#dogfish migrate &
 
 # Add any additional script here. 
+cp /defaults/${DNS_PROVIDER}.example /etc/ddclient/ddclient.conf
+HOST_IP=$(ping -c 1 $SERVER_HOSTNAME | grep -o -E '\d+\.\d+\.\d+\.\d+' | head -n 1)
+find /etc/ddclient/ -type f | xargs sed -i "s/<HOST_IP>/${HOST_IP}/g"
+find /etc/ddclient/ -type f | xargs sed -i "s/<DNS_TOKEN>/$(cat run/secrets/dns_token)/g"
+find /etc/ddclient/ -type f | xargs sed -i "s/<NFQDN-HOSTNAME>/${DOMAIN}/g"
+
+echo "Starting ddclient"
 
 exec "$@"

@@ -1,4 +1,4 @@
-#FROM [ORG/IMAGE:TAG]
+FROM linuxserver/ddclient:version-v3.9.1
 # TO add bash to a minimal image:
 #FROM vault:1.1.1 as base
 #FROM alpine:3.10
@@ -18,10 +18,12 @@
 
 #
 ### Set up the CMD as well as the pre and post hooks.
-#COPY go-init /bin/go-init
-#COPY entrypoint.sh /usr/bin/entrypoint.sh
-#COPY exitpoint.sh /usr/bin/exitpoint.sh
+COPY go-init /bin/go-init
+COPY entrypoint.sh /usr/bin/entrypoint.sh
+COPY exitpoint.sh /usr/bin/exitpoint.sh
 #
-#ENTRYPOINT ["go-init"]
-#CMD ["-main", "/usr/bin/entrypoint.sh", "-post", "/usr/bin/exitpoint.sh"]
+ENTRYPOINT ["go-init"]
+CMD ["-main", "/usr/bin/entrypoint.sh ddclient -foreground -daemon 1", "-post", "/usr/bin/exitpoint.sh"]
 #
+COPY config /defaults
+RUN mkdir -p /var/cache/ddclient/
