@@ -57,6 +57,7 @@ services:
     environment:
       - SERVER_HOSTNAME=$SERVER_HOSTNAME
       - DOMAIN=$DOMAIN
+      - DNS_USERNAME=${DNS_USERNAME}
       - DNS_PROVIDER=${DNS_PROVIDER}
     image: ${image_provider:-scififarms}/technocore-ddclient:${TAG:-latest}
     logging:
@@ -70,8 +71,6 @@ services:
     #    target: admin_password
       - source: ddclient_dns_token
         target: dns_token
-      - source: ddclient_dns_user
-        target: dns_user
     volumes:
       # Use tmpfs so that credentials never make it to disk. 
       - type: tmpfs
