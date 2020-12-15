@@ -23,7 +23,8 @@ COPY entrypoint.sh /usr/bin/entrypoint.sh
 COPY exitpoint.sh /usr/bin/exitpoint.sh
 #
 ENTRYPOINT ["go-init"]
-CMD ["-main", "/usr/bin/entrypoint.sh ddclient -foreground -daemon 1", "-post", "/usr/bin/exitpoint.sh"]
+# TODO: Make it so that -verbose will be used if $DEBUG... or $TECHNOCORE_DEBUG is true.
+CMD ["-main", "/usr/bin/entrypoint.sh ddclient -foreground -daemon 1 ", "-post", "/usr/bin/exitpoint.sh"]
 #
 COPY config /defaults
 RUN mkdir -p /var/cache/ddclient/

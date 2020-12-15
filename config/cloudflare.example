@@ -1,0 +1,12 @@
+## Cloudflare
+# WARNING: With cloudflare, the DNS record must already exist. Lame, but true.
+protocol=cloudflare
+use=cmd, cmd='echo <HOST_IP>'
+ip=<HOST_IP>
+login=<DNS_USERNAME>
+password=<DNS_TOKEN>
+wildcard=yes
+
+zone=<DNS_ZONE>
+*.<DOMAIN> 
+<DOMAIN>

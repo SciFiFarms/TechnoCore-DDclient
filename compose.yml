@@ -41,7 +41,6 @@ services:
       #  - traefik.webservice.frontend.entryPoints=https
         - com.ouroboros.enable=true
         - user-provided-secret-dns_token=ddclient dns_token
-        - user-provided-secret-dns_user=ddclient dns_user
       mode: global
       restart_policy:
         condition: any
